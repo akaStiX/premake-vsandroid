@@ -5,10 +5,23 @@
 ---
 
 
-	premake.modules.android = {}
+	premake.modules.vsandroid = {}
+	
+	local p = premake
+	local vstudio = p.vstudio
+	local android = p.modules.vsandroid
 
-	local android = premake.modules.android
+	
+	function android.generateProject(prj)
+		if prj.kind == "Packaging" then
+			p.generate(prj, ".androidproj", p.modules.vsandroid_packaging.generatePackaging)
+		else
+			vstudio.vs2010.generateProject(prj)
+		end
+	end
 
+
+	include("vsandroid_packaging.lua")
 	include("_preload.lua")
 
 	configuration { "VSAndroid" }

@@ -7,10 +7,10 @@
 
 	local p = premake
 
-	p.modules.vsandroid = { }
+	-- p.modules.vsandroid = { }
 	local m = p.modules.vsandroid
 
-	local android = p.modules.android
+	local android = p.modules.vsandroid
 	local vc2010 = p.vstudio.vc2010
 	local vstudio = p.vstudio
 	local config = p.config
@@ -49,13 +49,17 @@
 			vc2010.projectGuid,
 			vc2010.ignoreWarnDuplicateFilename,
 			m.keyword,
-			m.projectName,
 		}
 	end)
 	
 
 	premake.override(vstudio, "projectfile", function(oldFn, prj)
-		return p.filename(prj, ".vcxproj")		
+	    local extension = ".vcxproj"
+        if prj.kind == "Packaging" then
+	        extension = ".androidproj"
+	    end
+	    
+		return p.filename(prj, extension)
 	end)
 
 	

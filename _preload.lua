@@ -16,6 +16,7 @@
 	p.ANDROID = "vsandroid"
 
 	api.addAllowed("system", p.ANDROID)
+	api.addAllowed("kind", { "Packaging" })
 	api.addAllowed("architecture", { "arm" })
 	api.addAllowed("vectorextensions", { "NEON" })
 	api.addAllowed("exceptionhandling", {"UnwindTables"})
@@ -195,6 +196,26 @@
 		kind = "path"
 	}
 	
+---
+--  Android packaging API
+---	
+	api.register {
+		name = "antbuild",
+		scope = "project",
+		kind = "string"
+	}
+	
+	api.register {
+		name = "androidmanifest",
+		scope = "project",
+		kind = "string"
+	}
+	
+	api.register {
+		name = "antproperties",
+		scope = "project",
+		kind = "string"
+	}
 	
 	
 	
@@ -205,7 +226,7 @@
 
 		--os = "vsandroid",
 
-		valid_kinds     = { "WindowedApp", "StaticLib", "SharedLib" },
+		valid_kinds     = { "Packaging", "StaticLib", "SharedLib" },
 		valid_languages = { "C", "C++" },
 		valid_tools     = {
 			cc    = { "gcc", "clang" },
@@ -218,7 +239,7 @@
 		end,
 		
 		onProject = function(prj)
-			vstudio.vs2010.generateProject(prj)
+			p.modules.vsandroid.generateProject(prj)
 		end,
 		
 		-- onRule = function(rule)
