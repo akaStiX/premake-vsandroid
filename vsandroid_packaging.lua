@@ -11,8 +11,13 @@
 	local vc2010 = p.vstudio.vc2010
 	local project = p.project
 	local vstudio = p.vstudio
-	-- local config = p.config
+	local solution = p.solution
+	local tree = premake.tree
 	
+	
+---
+-- Override vs action's methods
+---
 	
 	premake.override(vstudio, "tool", function(oldfn, prj)
 		if prj.kind == "Packaging" then
@@ -21,6 +26,103 @@
 		
 		return oldfn(prj)
 	end)
+	
+	function pack.configurationPlatforms(sln)	-- TODO: refactor original premake to fix this
+		local descriptors = {}
+		local sorted = {}
+
+		for cfg in solution.eachconfig(sln) do
+
+			-- Create a Visual Studio solution descriptor (i.e. Debug|Win32) for
+			-- this solution configuration. I need to use it in a few different places
+			-- below so it makes sense to precompute it up front.
+
+			local platform = vstudio.solutionPlatform(cfg)
+			descriptors[cfg] = string.format("%s|%s", cfg.buildcfg, platform)
+
+			-- Also add the configuration to an indexed table which I can sort below
+
+			table.insert(sorted, cfg)
+
+		end
+
+		-- Sort the solution configurations to match Visual Studio's preferred
+		-- order, which appears to be a simple alpha sort on the descriptors.
+
+		table.sort(sorted, function(cfg0, cfg1)
+			return descriptors[cfg0]:lower() < descriptors[cfg1]:lower()
+		end)
+
+		-- Now I can output the sorted list of solution configuration descriptors
+
+		-- Visual Studio assumes the first configurations as the defaults.
+		if sln.defaultplatform then
+			_p(1,'GlobalSection(SolutionConfigurationPlatforms) = preSolution')
+			table.foreachi(sorted, function (cfg)
+				if cfg.platform == sln.defaultplatform then
+					_p(2,'%s = %s', descriptors[cfg], descriptors[cfg])
+				end
+			end)
+			_p(1,"EndGlobalSection")
+		end
+
+		_p(1,'GlobalSection(SolutionConfigurationPlatforms) = preSolution')
+		table.foreachi(sorted, function (cfg)
+			if not sln.defaultplatform or cfg.platform ~= sln.defaultplatform then
+				_p(2,'%s = %s', descriptors[cfg], descriptors[cfg])
+			end
+		end)
+		_p(1,"EndGlobalSection")
+
+		-- For each project in the solution...
+
+		_p(1,"GlobalSection(ProjectConfigurationPlatforms) = postSolution")
+
+		local tr = solution.grouptree(sln)
+		tree.traverse(tr, {
+			onleaf = function(n)
+				local prj = n.project
+
+				-- For each (sorted) configuration in the solution...
+
+				table.foreachi(sorted, function (cfg)
+
+					local platform, architecture
+
+					-- Look up the matching project configuration. If none exist, this
+					-- configuration has been excluded from the project, and should map
+					-- to closest available project configuration instead.
+
+					local prjCfg = project.getconfig(prj, cfg.buildcfg, cfg.platform)
+					local excluded = (prjCfg == nil or prjCfg.flags.ExcludeFromBuild)
+
+					if prjCfg == nil then
+						prjCfg = project.findClosestMatch(prj, cfg.buildcfg, cfg.platform)
+					end
+
+					local descriptor = descriptors[cfg]
+					local platform = vstudio.projectPlatform(prjCfg)
+					local architecture = vstudio.archFromConfig(prjCfg, true)
+
+					_p(2,'{%s}.%s.ActiveCfg = %s|%s', prj.uuid, descriptor, platform, architecture)
+
+					-- Only output Build.0 entries for buildable configurations
+
+					if not excluded and prjCfg.kind ~= premake.NONE then
+						_p(2,'{%s}.%s.Build.0 = %s|%s', prj.uuid, descriptor, platform, architecture)
+						
+						if prjCfg.kind == "Packaging" then
+							_p(2,'{%s}.%s.Deploy.0 = %s|%s', prj.uuid, descriptor, platform, architecture)
+						end
+					end
+
+				end)
+			end
+		})
+		_p(1,"EndGlobalSection")
+	end
+	
+	vstudio.sln2005.sectionmap["ConfigurationPlatforms"] = pack.configurationPlatforms
 	
 	
 	pack.elements = {}
