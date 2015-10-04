@@ -13,6 +13,16 @@
 	local vstudio = p.vstudio
 	-- local config = p.config
 	
+	
+	premake.override(vstudio, "tool", function(oldfn, prj)
+		if prj.kind == "Packaging" then
+			return "39E2626F-3545-4960-A6E8-258AD8476CE5"
+		end
+		
+		return oldfn(prj)
+	end)
+	
+	
 	pack.elements = {}
 	
 	pack.elements.project = function(prj)
