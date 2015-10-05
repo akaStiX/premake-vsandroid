@@ -217,6 +217,12 @@
 		kind = "string"
 	}
 	
+	api.register {
+		name = "symbolspath",
+		scope = "config",
+		kind = "path",
+		tokens = true,
+	}
 	
 	
 	newaction {

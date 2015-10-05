@@ -15,6 +15,11 @@
 	function android.generateProject(prj)
 		if prj.kind == "Packaging" then
 			p.generate(prj, ".androidproj", p.modules.vsandroid_packaging.generatePackaging)
+			
+			local user = p.capture(function() vstudio.vc2010.generateUser(prj) end)
+			if #user > 0 then
+				p.generate(prj, ".androidproj.user", function() p.outln(user) end)
+			end
 		else
 			vstudio.vs2010.generateProject(prj)
 		end
@@ -22,6 +27,7 @@
 
 
 	include("vsandroid_packaging.lua")
+	include("vsandroid_packaging_user.lua")
 	include("_preload.lua")
 
 	configuration { "VSAndroid" }
