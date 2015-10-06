@@ -43,23 +43,37 @@
 	--	vstudio.vs2010_architectures.android = "VSAndroid"
 	--end
 	
-
-	premake.override(vc2010.elements, "globals", function(oldfn, cfg)
+	function m.globals()
 		return {
 			vc2010.projectGuid,
 			vc2010.ignoreWarnDuplicateFilename,
 			m.keyword,
 		}
+	end
+
+	premake.override(vc2010.elements, "globals", function(oldfn, prj)
+		if _ACTION == "android" then
+			return m.globals()
+		end
+		
+		return oldfn(prj)
 	end)
 	
+	function m.projectfile(prj)
+		local extension = ".vcxproj"
+		if prj.kind == "Packaging" then
+			extension = ".androidproj"
+		end
+		
+		return p.filename(prj, extension)
+	end
 
 	premake.override(vstudio, "projectfile", function(oldFn, prj)
-	    local extension = ".vcxproj"
-        if prj.kind == "Packaging" then
-	        extension = ".androidproj"
-	    end
-	    
-		return p.filename(prj, extension)
+		if _ACTION == "android" then
+			return m.projectfile(prj)
+		end
+		
+		return oldFn(prj)
 	end)
 
 	
@@ -79,15 +93,18 @@
 	premake.override(vc2010.elements, "configurationProperties", function(oldfn, cfg)
 		local elements = oldfn(cfg)
 		
-		table.findAndRemove(elements, vc2010.characterSet)
-		
-		if cfg.kind ~= p.UTILITY and cfg.system == premake.ANDROID then
-			elements = table.join(elements, {
-				android.apiLevel,
-				android.stlType,
-				android.instructionSet,
-			})
+		if _ACTION == "android" then
+			table.findAndRemove(elements, vc2010.characterSet)
+			
+			if cfg.kind ~= p.UTILITY and cfg.system == premake.ANDROID then
+				elements = table.join(elements, {
+					android.apiLevel,
+					android.stlType,
+					android.instructionSet,
+				})
+			end
 		end
+		
 		return elements
 	end)
 
@@ -129,10 +146,8 @@
 			vc2010.element("ThumbMode", nil, IM[cfg.instructionmode])
 		end
 	end
-	
 
-	-- Note: this function is already patched in by vs2012...
-	premake.override(vc2010, "platformToolset", function(oldfn, cfg)
+	function m.platformToolset(cfg)
 		if cfg.toolchainversion ~= nil then
 			local toolset = {
 				["GCC 4.9"]		= "Gcc_4_9",
@@ -141,6 +156,15 @@
 
 			vc2010.element("PlatformToolset", nil, toolset[cfg.toolchainversion])
 		end
+	end	
+
+	-- Note: this function is already patched in by vs2012...
+	premake.override(vc2010, "platformToolset", function(oldfn, cfg)
+		if _ACTION == "android" then
+			return m.platformToolset(cfg)
+		end
+		
+		return oldfn(cfg)
 		--_p(2, '<TargetArchAbi>armeabi-v7a</TargetArchAbi>')
 	end)
 
@@ -152,27 +176,30 @@
 	premake.override(vc2010.elements, "clCompile", function(oldfn, cfg)
 		local elements = oldfn(cfg)
 		
-		table.replace(elements, vc2010.debugInformationFormat, android.debugInformationFormat)
-		table.replace(elements, vc2010.warningLevel, android.warningLevel)
-		table.replace(elements, vc2010.exceptionHandling, android.exceptionHandling)
-		table.replace(elements, vc2010.enableEnhancedInstructionSet, android.enableEnhancedInstructionSet)
-		
-		if cfg.system == premake.ANDROID then
-			elements = table.join(elements, {
-				android.strictAliasing,
-				android.floatabi,
-				android.pic,
-				android.verboseCompiler,
-				android.undefineAllPreprocessorDefinitions,
-				android.showIncludes,
-				android.dataLevelLinking,
-				android.shortEnums,
-				android.cStandard,
-				android.cppStandard,
-				android.precompiledHeaderCompileAs,
-				android.precompiledHeaderOutputDir,
-			})
+		if _ACTION == "android" then
+			table.replace(elements, vc2010.debugInformationFormat, android.debugInformationFormat)
+			table.replace(elements, vc2010.warningLevel, android.warningLevel)
+			table.replace(elements, vc2010.exceptionHandling, android.exceptionHandling)
+			table.replace(elements, vc2010.enableEnhancedInstructionSet, android.enableEnhancedInstructionSet)
+			
+			if cfg.system == premake.ANDROID then
+				elements = table.join(elements, {
+					android.strictAliasing,
+					android.floatabi,
+					android.pic,
+					android.verboseCompiler,
+					android.undefineAllPreprocessorDefinitions,
+					android.showIncludes,
+					android.dataLevelLinking,
+					android.shortEnums,
+					android.cStandard,
+					android.cppStandard,
+					android.precompiledHeaderCompileAs,
+					android.precompiledHeaderOutputDir,
+				})
+			end
 		end
+		
 		return elements
 	end)
 	
@@ -185,12 +212,6 @@
 		 	vc2010.element("CompileAs", nil, "CompileAsCpp")
 		end
 	end)
-	
-	function m.compileAs(cfg)
-		if cfg.project.language == "C" then
-			m.element("CompileAs", nil, "CompileAsC")
-		end
-	end
 	
 -- 
 -- Replaced functions
@@ -310,10 +331,15 @@
 --
 
 	premake.override(vc2010, "linkIncremental", function(oldfn, cfg)
-		if cfg.kind ~= p.STATICLIB then
-			vc2010.element("IncrementalLink", nil, tostring(config.canLinkIncremental(cfg)))
+		if _ACTION == "android" then
+			if cfg.kind ~= p.STATICLIB then
+				vc2010.element("IncrementalLink", nil, tostring(config.canLinkIncremental(cfg)))
+			end
+		else
+			oldfn(cfg)
 		end
 	end)
+
 	
 	-- function m.ignoreDefaultLibraries(cfg)	-- TODO: migrate to latest premake, since it has support for this
 	-- 	if #cfg.ignoredefaultlibraries > 0 then
@@ -329,7 +355,7 @@
 	-- 	end
 	-- end
 	
-	premake.override(vc2010.elements, "link", function(oldfn, cfg, explicit)
+	function m.link(cfg)
 		if cfg.kind == p.SHAREDLIB then
 			return {
 				vc2010.additionalDependencies,
@@ -350,6 +376,14 @@
 		else
 			return {}
 		end
+	end
+	
+	premake.override(vc2010.elements, "link", function(oldfn, cfg, explicit)
+		if _ACTION == "android" then
+			return m.link(cfg)
+		end
+		
+		return oldfn(cfg, explicit)
 	end)
 	
 	function android.showProgress(cfg)
@@ -412,8 +446,8 @@
 -- 
 -- Static library properties 
 -- 
-	
-	premake.override(vc2010.elements, "lib", function(oldfn, cfg, explicit)
+
+	function m.lib(cfg)
 		if cfg.kind == p.STATICLIB then
 			return {
 				vc2010.additionalDependencies,
@@ -429,6 +463,14 @@
 		else
 			return {}
 		end
+	end
+	
+	premake.override(vc2010.elements, "lib", function(oldfn, cfg, explicit)
+		if _ACTION == "android" then
+			return m.lib(cfg)
+		end
+		
+		return oldfn(cfg, explicit)
 	end)
 	
 	

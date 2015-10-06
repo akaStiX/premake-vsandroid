@@ -122,7 +122,10 @@
 		_p(1,"EndGlobalSection")
 	end
 	
-	vstudio.sln2005.sectionmap["ConfigurationPlatforms"] = pack.configurationPlatforms
+	
+	if _ACTION == "android" then
+		vstudio.sln2005.sectionmap["ConfigurationPlatforms"] = pack.configurationPlatforms
+	end
 	
 	
 	pack.elements = {}

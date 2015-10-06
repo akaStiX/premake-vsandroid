@@ -12,9 +12,11 @@
 	premake.override(vc2010.elements, "debugSettings", function(oldfn, cfg)
 		local elements = oldfn(cfg)
 		
-		elements = table.join(elements, {	--TODO: add other options
-				pack.additionalSymbolSearchPaths,
-			})
+		if _ACTION == "android" then
+			elements = table.join(elements, {	--TODO: add other options
+					pack.additionalSymbolSearchPaths,
+				})
+		end
 			
 		return elements
 	end)

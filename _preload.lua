@@ -236,7 +236,7 @@
 		shortname   = "Android project for Visual Studio 2015",
 		description = "Generate Android project files for Visual Studio 2015",
 
-		--os = "vsandroid",
+		os = "windows",
 
 		valid_kinds     = { "Packaging", "StaticLib", "SharedLib" },
 		valid_languages = { "C", "C++" },
