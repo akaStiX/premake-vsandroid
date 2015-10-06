@@ -163,19 +163,21 @@
 	api.register {
 		name = "precompiledheaderoutputdir",
 		scope = "config",
-		kind = "path"
+		kind = "path",
+		tokens = true,
 	}
 	
 	api.register {
 		name = "sharedlibrarysearchpath",
 		scope = "config",
-		kind = "path"
+		kind = "path",
+		tokens = true,
 	}
 	
 	api.register {
 		name = "forcesymbolreferences",
 		scope = "config",
-		kind = "path"
+		kind = "path",
 	}
 	
 	api.register {
@@ -193,7 +195,8 @@
 	api.register {
 		name = "generatemapfile",
 		scope = "config",
-		kind = "path"
+		kind = "path",
+		tokens = true,
 	}
 	
 ---
@@ -202,19 +205,22 @@
 	api.register {
 		name = "antbuild",
 		scope = "project",
-		kind = "string"
+		kind = "string",
+		tokens = true,
 	}
 	
 	api.register {
 		name = "androidmanifest",
 		scope = "project",
-		kind = "string"
+		kind = "string",
+		tokens = true,
 	}
 	
 	api.register {
 		name = "antproperties",
 		scope = "project",
-		kind = "string"
+		kind = "string",
+		tokens = true,
 	}
 	
 	api.register {
