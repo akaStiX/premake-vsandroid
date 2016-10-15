@@ -182,6 +182,8 @@
 			table.replace(elements, vc2010.exceptionHandling, android.exceptionHandling)
 			table.replace(elements, vc2010.enableEnhancedInstructionSet, android.enableEnhancedInstructionSet)
 			
+			table.findAndRemove(elements, vc2010.multiProcessorCompilation)
+			
 			if cfg.system == premake.ANDROID then
 				elements = table.join(elements, {
 					android.strictAliasing,
@@ -323,6 +325,27 @@
 	function android.precompiledHeaderOutputDir(cfg)
 		if cfg.precompiledheaderoutputdir ~= nil then
 			vc2010.element("PrecompiledHeaderOutputFileDirectory", nil, cfg.precompiledheaderoutputdir)
+		end
+	end
+	
+	
+	premake.override(vc2010.elements, "outputProperties", function(oldfn, cfg)
+		local elements = oldfn(cfg)
+		
+		if _ACTION == "android" then
+			if cfg.kind ~= p.UTILITY and cfg.system == premake.ANDROID then
+				elements = table.join(elements, {
+					android.multiProcessorCompilation,
+				})
+			end
+		end
+		
+		return elements
+	end)
+	
+	function android.multiProcessorCompilation(cfg)
+		if cfg.flags.MultiProcessorCompile then
+			vc2010.element("UseMultiToolTask", nil, "true")
 		end
 	end
 
