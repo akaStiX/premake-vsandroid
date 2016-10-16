@@ -83,7 +83,7 @@
 		vc2010.element("DefaultLanguage", nil, "en-US")
 		vc2010.element("MinimumVisualStudioVersion", nil, "14.0")
 		vc2010.element("ApplicationType", nil, "Android")
-		vc2010.element("ApplicationTypeRevision", nil, "1.0")
+		vc2010.element("ApplicationTypeRevision", nil, "2.0")
 	end
 
 --
@@ -151,7 +151,7 @@
 		if cfg.toolchainversion ~= nil then
 			local toolset = {
 				["GCC 4.9"]		= "Gcc_4_9",
-				["Clang 3.6"]	= "Clang_3_6",
+				["Clang 3.8"]	= "Clang_3_8",
 			}
 
 			vc2010.element("PlatformToolset", nil, toolset[cfg.toolchainversion])

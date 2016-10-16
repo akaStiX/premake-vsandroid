@@ -77,7 +77,7 @@
 		kind = "string",
 		allowed = {
 			"GCC 4.9",
-			"Clang 3.6",
+			"Clang 3.8",
 		},
 	}
 
