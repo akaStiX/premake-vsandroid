@@ -221,7 +221,7 @@
 	
 	function android.debugInformationFormat(cfg)
 		local value
-		if cfg.flags.Symbols then
+		if cfg.symbols == "On" then
 			if cfg.debugformat == "c7" then
 				error("Debugformat option is unavailable for VS Android")
 			end
