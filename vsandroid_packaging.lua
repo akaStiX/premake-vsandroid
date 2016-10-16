@@ -123,9 +123,15 @@
 	end
 	
 	
-	if _ACTION == "android" then
-		vstudio.sln2005.sectionmap["ConfigurationPlatforms"] = pack.configurationPlatforms
-	end
+	premake.override(vstudio.sln2005.elements, "sections", function(oldfn, prj)
+		local elements = oldfn(cfg)
+		
+		if _ACTION == "android" then
+			table.replace(elements, vstudio.sln2005.configurationPlatforms, pack.configurationPlatforms)
+		end
+		
+		return elements
+	end)
 	
 	
 	pack.elements = {}
@@ -296,18 +302,10 @@
 	
 	function pack.files(prj)
 		local groups = vc2010.categorizeSources(prj)
-		
-		local category = "Content"
-		local newGroups = {}
-		newGroups[category] = newGroups[category] or {}
 
-		for group, files in pairs(groups) do
-			for _, file in ipairs(files) do
-				table.insert(newGroups[category], file)
-			end
+		for _, group in ipairs(groups) do
+			vc2010.emitFiles(prj, group, "Content")
 		end
-		
-		vc2010.emitFiles(prj, newGroups, category)
 		
 		p.push('<ItemGroup>')
 		pack.antBuild(prj)

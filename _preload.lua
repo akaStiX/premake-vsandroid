@@ -223,13 +223,6 @@
 		tokens = true,
 	}
 	
-	api.register {
-		name = "symbolspath",
-		scope = "config",
-		kind = "path",
-		tokens = true,
-	}
-	
 	
 	newaction {
 		trigger     = "android",
