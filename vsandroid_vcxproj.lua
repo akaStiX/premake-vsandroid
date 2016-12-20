@@ -395,6 +395,7 @@
 				android.relocation,
 				android.functionBinding,
 				android.noExecStackRequired,
+				android.wholeArchive,
 			}
 		else
 			return {}
@@ -463,6 +464,10 @@
 	
 	function android.noExecStackRequired(cfg)
 		setBoolOption("NoExecStackRequired", cfg.flags.NoExecStackRequired, "true")
+	end
+
+	function android.wholeArchive(cfg)
+		setBoolOption("WholeArchiveBegin", cfg.flags.WholeArchive, "true")
 	end
 	
 	
