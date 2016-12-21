@@ -39,6 +39,7 @@
 		"NoWarnOnCreate",
 		"TruncateTimestamp",
 		"SuppressStartupBanner",
+		"WholeArchive",
 	})
 	
 	vstudio.vs2010_architectures.arm = "ARM"
