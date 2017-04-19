@@ -17,7 +17,7 @@
 
 	api.addAllowed("system", p.ANDROID)
 	api.addAllowed("kind", { "Packaging" })
-	api.addAllowed("architecture", { "arm" })
+	api.addAllowed("architecture", { "arm", "arm64" })
 	api.addAllowed("vectorextensions", { "NEON" })
 	api.addAllowed("exceptionhandling", {"UnwindTables"})
 	api.addAllowed("flags", {
@@ -43,7 +43,9 @@
 	})
 	
 	vstudio.vs2010_architectures.arm = "ARM"
+	vstudio.vs2010_architectures.arm64 = "ARM64"
 	vstudio.vs200x_architectures.arm = "ARM"
+	vstudio.vs200x_architectures.arm64 = "ARM64"
 
 	-- local os = p.fields["os"];
 	-- if os ~= nil then
