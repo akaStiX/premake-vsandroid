@@ -243,7 +243,7 @@
 	end
 	
 	function pack.androidAppLibName(cfg)
-		vc2010.element("AndroidAppLibName", nil, "$(RootNamespace)")	-- TODO: fix
+		vc2010.element("AndroidAppLibName", nil, cfg.androidapplibname)
 	end
 	
 	function pack.applicationName(cfg)
