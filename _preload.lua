@@ -225,7 +225,7 @@
 	}
 	
 	api.register {
-		name = "androidapplibname",
+		name = "applibname",
 		scope = "project",
 		kind = "string",
 		tokens = true,
