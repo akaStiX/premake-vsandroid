@@ -243,7 +243,7 @@
 	end
 	
 	function pack.androidAppLibName(cfg)
-		vc2010.element("AndroidAppLibName", nil, cfg.applibname)
+		vc2010.element("AndroidAppLibName", nil, prj.applibname)
 	end
 	
 	function pack.applicationName(cfg)
