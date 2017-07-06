@@ -224,6 +224,12 @@
 		tokens = true,
 	}
 	
+	api.register {
+		name = "applibname",
+		scope = "project",
+		kind = "string",
+		tokens = true,
+	}
 	
 	newaction {
 		trigger     = "android",
