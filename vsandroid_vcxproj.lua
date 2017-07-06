@@ -81,9 +81,9 @@
 		vc2010.element("Keyword", nil, "Android")
 		vc2010.element("RootNamespace", nil, "%s", prj.name)
 		vc2010.element("DefaultLanguage", nil, "en-US")
-		vc2010.element("MinimumVisualStudioVersion", nil, "14.0")
+		vc2010.element("MinimumVisualStudioVersion", nil, "15.0")
 		vc2010.element("ApplicationType", nil, "Android")
-		vc2010.element("ApplicationTypeRevision", nil, "2.0")
+		vc2010.element("ApplicationTypeRevision", nil, "3.0")
 	end
 
 --
