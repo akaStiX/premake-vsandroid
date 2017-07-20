@@ -262,6 +262,23 @@
 		end
 	end
 	
+	function android.optimization(cfg, condition)
+		local map = { Off="Disabled", On="Full", Debug="Disabled", Full="Full", Size="MinSize", Speed="MaxSpeed" }
+		local value = map[cfg.optimize]
+		if value or not condition then
+			vc2010.element('Optimization', condition, value or "Disabled")
+		end
+	end
+	
+	premake.override(vc2010, "optimization", function(oldfn, prj, condition)
+		if _ACTION == "android" then
+			return android.optimization(prj, condition)
+		end
+		
+		return oldfn(prj, condition)
+	end)
+
+	
 -- 
 -- Additional Android compilation settings 
 -- 
